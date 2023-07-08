@@ -3,6 +3,14 @@ locals {
   worker_group1_tags = { "name" : "nodegroup-01" }
 }
 
+data "terraform_remote_state" "vpc" {
+  backend = "s3"
+  config = {
+    bucket = "devterraform-tfstate"
+    key    = "dev/vpc/terraform.tfstate"
+    region = "ap-south-1"
+  }
+}
 module "dev_eks_cluster" {
   source                    = "OT-CLOUD-KIT/eks/aws"
   version                   = "1.1.0"
