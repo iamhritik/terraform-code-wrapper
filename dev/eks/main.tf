@@ -9,7 +9,7 @@ module "dev_eks_cluster" {
   cluster_name              = "dev-cluster"
   eks_cluster_version       = "1.24"
   enabled_cluster_log_types = ["api", "audit"]
-  subnets                   = ["subnet-0b8d36e5e8c0f4722", "subnet-0bc0160cbd21577f0"]
+  subnets                   = ["subnet-00ee81ae8342dafd0", "subnet-0bf81719cc087912d"]
   tags                      = local.common_tags
   kubeconfig_name           = "dev_config"
   config_output_path        = "config"
@@ -18,10 +18,10 @@ module "dev_eks_cluster" {
   create_node_group         = true
   endpoint_private          = true
   endpoint_public           = false
-  vpc_id                    = "vpc-0b9550b5fc5ce411b"
+  vpc_id                    = "vpc-0206ed6a00eb45e52"
   node_groups = {
     "worker1" = {
-      subnets            = ["subnet-0b8d36e5e8c0f4722", "subnet-0bc0160cbd21577f0"]
+      subnets            = ["subnet-00ee81ae8342dafd0", "subnet-0bf81719cc087912d"]
       ssh_key            = "opstree"
       security_group_ids = ["sg-09a50445f53421d1e"]
       instance_type      = ["t3a.small"]
@@ -43,6 +43,9 @@ data "aws_security_group" "controlplane_sg" {
   tags = {
     "aws:eks:cluster-name" = "dev-cluster"
   }
+  depends_on = [
+    module.dev_eks_cluster
+  ]
 }
 
 #Jenkins SG to communicate with eks cluster

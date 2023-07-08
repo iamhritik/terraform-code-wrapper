@@ -5,11 +5,11 @@ terraform {
       version = "~> 5.0"
     }
   }
-  #   backend "s3" {
-  #     bucket = "devterraform-tfstate"
-  #     key    = "dev/eks/terraform.tfstate"
-  #     region = "ap-south-1"
-  #   } 
+    backend "s3" {
+      bucket = "devterraform-tfstate"
+      key    = "dev/eks/terraform.tfstate"
+      region = "ap-south-1"
+    } 
 }
 
 provider "aws" {
