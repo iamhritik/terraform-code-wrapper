@@ -1,6 +1,6 @@
 locals {
   common_tags        = { ENV : "DEV", OWNER : "DEVOPS", PROJECT : "DEV_EKS_CLUSTER", COMPONENT : "EKS" }
-  worker_group1_tags = { "name" : "nodegroup-01" }
+  worker_group1_tags = { "name" : "nodegroup-01", "karpenter.sh/discovery" : var.cluster_name }
 }
 
 data "terraform_remote_state" "vpc" {
@@ -14,21 +14,21 @@ data "terraform_remote_state" "vpc" {
 module "dev_eks_cluster" {
   source                    = "OT-CLOUD-KIT/eks/aws"
   version                   = "1.1.0"
-  cluster_name              = "dev-cluster"
-  eks_cluster_version       = "1.24"
+  cluster_name              = var.cluster_name
+  eks_cluster_version       = var.cluster_version
   enabled_cluster_log_types = ["api", "audit"]
   subnets                   = flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id)
   tags                      = local.common_tags
   kubeconfig_name           = "dev_config"
   config_output_path        = "config"
   eks_node_group_name       = "dev_node_group"
-  region                    = "ap-south-1"
+  region                    = var.region
   create_node_group         = true
   endpoint_private          = true
   endpoint_public           = false
   vpc_id                    = data.terraform_remote_state.vpc.outputs.vpc_id
   node_groups = {
-    "worker1" = {
+    "dev_node_group" = {
       subnets            = flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id)
       ssh_key            = "opstree"
       security_group_ids = ["sg-001d4d01d818ed07f"]
