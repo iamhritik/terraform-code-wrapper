@@ -68,3 +68,10 @@ resource "aws_security_group_rule" "example" {
     data.aws_security_group.controlplane_sg
   ]
 }
+
+resource "aws_ec2_tag" "add_tags_into_subnet" {
+  for_each = toset(flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id))
+  resource_id = each.key
+  key         = "karpenter.sh/discovery"
+  value       = var.cluster_name
+}
