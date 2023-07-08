@@ -63,7 +63,7 @@ resource "aws_security_group_rule" "example" {
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
-  source_security_group_id = "sg-00ca991b504ae1fdc" #specify SG ID that you used to connect with kubernetes API server
+  source_security_group_id = "sg-001d4d01d818ed07f" #specify SG ID that you used to connect with kubernetes API server
   depends_on = [
     data.aws_security_group.controlplane_sg
   ]
