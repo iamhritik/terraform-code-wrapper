@@ -31,7 +31,7 @@ module "dev_eks_cluster" {
     "worker1" = {
       subnets            = flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id)
       ssh_key            = "opstree"
-      security_group_ids = ["sg-09a50445f53421d1e"]
+      security_group_ids = ["sg-001d4d01d818ed07f"]
       instance_type      = ["t3a.small"]
       desired_capacity   = 1
       max_capacity       = 2
