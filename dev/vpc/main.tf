@@ -29,3 +29,10 @@ module "vpc_creation" {
   alb_certificate_arn = null
 }
 
+output "vpc_id" {
+  value = module.vpc_creation.vpc_id
+}
+
+output "private_subnets_id" {
+  value = module.vpc_creation.pvt_subnet_ids
+}

@@ -9,7 +9,7 @@ module "dev_eks_cluster" {
   cluster_name              = "dev-cluster"
   eks_cluster_version       = "1.24"
   enabled_cluster_log_types = ["api", "audit"]
-  subnets                   = ["subnet-00ee81ae8342dafd0", "subnet-0bf81719cc087912d"]
+  subnets                   = flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id)
   tags                      = local.common_tags
   kubeconfig_name           = "dev_config"
   config_output_path        = "config"
@@ -18,10 +18,10 @@ module "dev_eks_cluster" {
   create_node_group         = true
   endpoint_private          = true
   endpoint_public           = false
-  vpc_id                    = "vpc-0206ed6a00eb45e52"
+  vpc_id                    = data.terraform_remote_state.vpc.outputs.vpc_id
   node_groups = {
     "worker1" = {
-      subnets            = ["subnet-00ee81ae8342dafd0", "subnet-0bf81719cc087912d"]
+      subnets            = flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id)
       ssh_key            = "opstree"
       security_group_ids = ["sg-09a50445f53421d1e"]
       instance_type      = ["t3a.small"]
