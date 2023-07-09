@@ -66,7 +66,8 @@ resource "aws_security_group_rule" "example" {
   source_security_group_id = "sg-001d4d01d818ed07f" #specify SG ID that you used to connect with kubernetes API server
   depends_on = [
     module.dev_eks_cluster,
-    data.aws_security_group.controlplane_sg
+    data.aws_security_group.controlplane_sg,
+    kubectl_manifest.karpenter_node_template
   ]
 }
 
