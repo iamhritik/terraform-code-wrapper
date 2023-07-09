@@ -1,66 +1,24 @@
-provider "kubernetes" {
-  host                   = module.dev_eks_cluster.endpoint
-  cluster_ca_certificate = base64decode(module.dev_eks_cluster.kubeconfig-certificate-authority-data)
-
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", var.cluster_name]
-  }
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = module.dev_eks_cluster.endpoint
-    cluster_ca_certificate = base64decode(module.dev_eks_cluster.kubeconfig-certificate-authority-data)
-
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      # This requires the awscli to be installed locally where Terraform is executed
-      args = ["eks", "get-token", "--cluster-name", var.cluster_name]
-    }
-  }
-}
-
-provider "kubectl" {
-  apply_retry_count      = 5
-  host                   = module.dev_eks_cluster.endpoint
-  cluster_ca_certificate = base64decode(module.dev_eks_cluster.kubeconfig-certificate-authority-data)
-  load_config_file       = false
-
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", var.cluster_name]
-  }
-}
-
 data "aws_availability_zones" "available" {}
 data "aws_ecrpublic_authorization_token" "token" {
     provider = aws.virginia
 }
-
+data "aws_vpc" "selected" {
+  id = data.terraform_remote_state.vpc.outputs.vpc_id
+}
 locals {
   name            = "ex-${replace(basename(path.cwd), "_", "-")}"
   cluster_version = var.cluster_version
   region          = var.region
-
-  vpc_cidr = "10.0.0.0/16"
+  vpc_cidr = data.aws_vpc.cidr_block
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
-
   tags = {
-    purpose = "karpenter-deployment"
+    resource = "karpenter"
   }
 }
-
 
 ################################################################################
 # Karpenter
 ################################################################################
-
 module "karpenter" {
   source = "../../modules/karpenter"
   cluster_name           = var.cluster_name
@@ -150,7 +108,6 @@ resource "kubectl_manifest" "karpenter_node_template" {
       tags:
         karpenter.sh/discovery: ${var.cluster_name}
   YAML
-
   depends_on = [
     helm_release.karpenter
   ]
