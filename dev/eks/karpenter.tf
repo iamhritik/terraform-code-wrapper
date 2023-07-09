@@ -63,18 +63,12 @@ locals {
 
 module "karpenter" {
   source = "../../modules/karpenter"
-
   cluster_name           = var.cluster_name
   irsa_oidc_provider_arn = aws_iam_openid_connect_provider.oidcp.arn
-
   policies = {
     AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   }
-
   tags = local.tags
-  depends_on = [ 
-    module.dev_eks_cluster
-   ]
 }
 
 resource "helm_release" "karpenter" {
@@ -112,8 +106,8 @@ resource "helm_release" "karpenter" {
     value = module.karpenter.queue_name
   }
   depends_on = [ 
-    module.karpenter,
-    module.dev_eks_cluster
+    module.dev_eks_cluster,
+    module.karpenter
    ]
 
 }
