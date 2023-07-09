@@ -72,6 +72,9 @@ module "karpenter" {
   }
 
   tags = local.tags
+  depends_on = [ 
+    module.dev_eks_cluster
+   ]
 }
 
 resource "helm_release" "karpenter" {
@@ -104,6 +107,10 @@ resource "helm_release" "karpenter" {
     name  = "settings.aws.defaultInstanceProfile"
     value = module.karpenter.instance_profile_name
   }
+  depends_on = [ 
+    module.karpenter,
+    module.dev_eks_cluster
+   ]
 
 }
 
