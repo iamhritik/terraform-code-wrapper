@@ -109,6 +109,7 @@ resource "kubectl_manifest" "karpenter_node_template" {
         karpenter.sh/discovery: ${var.cluster_name}
   YAML
   depends_on = [
-    helm_release.karpenter
+    helm_release.karpenter,
+    aws_security_group_rule.jenkins_add
   ]
 }
