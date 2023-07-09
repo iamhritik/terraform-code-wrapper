@@ -8,7 +8,7 @@ data "aws_eks_cluster" "cluster" {
 data "tls_certificate" "cluster_certificate" {
   url = data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer
   depends_on = [
-    data.aws_eks_cluster
+    module.dev_eks_cluster
   ]
 }
 
@@ -17,7 +17,7 @@ resource "aws_iam_openid_connect_provider" "oidcp" {
   thumbprint_list = [data.tls_certificate.cluster_certificate.certificates[0].sha1_fingerprint]
   url             = data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer
   depends_on = [
-    data.tls_certificate.cluster_certificate
+    module.dev_eks_cluster
   ]
 }
 
@@ -48,6 +48,6 @@ resource "aws_eks_identity_provider_config" "demo" {
     issuer_url                    = "https://${aws_iam_openid_connect_provider.oidcp.url}"
   }
   depends_on = [
-    data.tls_certificate.cluster_certificate
+    module.dev_eks_cluster
   ]
 }
