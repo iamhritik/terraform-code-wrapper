@@ -2,14 +2,14 @@ data "aws_availability_zones" "available" {}
 data "aws_ecrpublic_authorization_token" "token" {
     provider = aws.virginia
 }
-data "aws_vpc" "selected" {
+data "aws_vpc" "details" {
   id = data.terraform_remote_state.vpc.outputs.vpc_id
 }
 locals {
   name            = "ex-${replace(basename(path.cwd), "_", "-")}"
   cluster_version = var.cluster_version
   region          = var.region
-  vpc_cidr = data.aws_vpc.cidr_block
+  vpc_cidr = data.aws_vpc.details.cidr_block
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
   tags = {
     resource = "karpenter"
