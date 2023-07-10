@@ -77,7 +77,8 @@ resource "aws_ec2_tag" "add_tags_into_subnet" {
   value       = var.cluster_name
 }
 
-resource "aws_ec2_tag" "add_tags_into_sg" {
+
+resource "aws_ec2_tag" "karpenter_tags_01" {
   resource_id =data.aws_security_group.controlplane_sg.id
   key         = "karpenter.sh/discovery"
   value       = var.cluster_name
@@ -87,7 +88,12 @@ resource "aws_ec2_tag" "add_tags_into_sg" {
   ]
 }
 
-
-output "nodegroup_data" {
-  value = module.dev_eks_cluster.module_node_group_resources
+resource "aws_ec2_tag" "karpenter_tags_02" {
+  resource_id = module.dev_eks_cluster.module_node_group_resources["dev-cluster:dev_node_gro"][0].remote_access_security_group_id
+  key         = "karpenter.sh/discovery"
+  value       = var.cluster_name
+  depends_on = [
+    module.dev_eks_cluster,
+    data.aws_security_group.controlplane_sg
+  ]
 }
