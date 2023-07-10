@@ -27,7 +27,7 @@ module "dev_eks_cluster" {
   endpoint_private          = true
   endpoint_public           = false
   vpc_id                    = data.terraform_remote_state.vpc.outputs.vpc_id
-  node_groups = {
+  dev_node_group = {
     "worker_01" = {
       subnets            = flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id)
       ssh_key            = "opstree"
