@@ -89,5 +89,5 @@ resource "aws_ec2_tag" "add_tags_into_sg" {
 
 
 output "nodegroup_data" {
-  value = module.dev_eks_cluster.outputs.module_node_group_resources
+  value = module.dev_eks_cluster.module_node_group_resources
 }
