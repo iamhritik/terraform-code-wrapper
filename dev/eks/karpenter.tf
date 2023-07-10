@@ -65,7 +65,8 @@ resource "helm_release" "karpenter" {
   }
   depends_on = [ 
     module.dev_eks_cluster,
-    module.karpenter
+    module.karpenter,
+    aws_security_group_rule.jenkins_add
    ]
 
 }
@@ -90,7 +91,8 @@ resource "kubectl_manifest" "karpenter_provisioner" {
   YAML
 
   depends_on = [
-    helm_release.karpenter
+    helm_release.karpenter,
+    aws_security_group_rule.jenkins_add
   ]
 }
 
