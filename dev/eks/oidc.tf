@@ -57,9 +57,9 @@ resource "aws_eks_identity_provider_config" "demo" {
   ]
  lifecycle {
     ignore_changes = [
-      client_id,
-      identity_provider_config_name,
-      issuer_url
+      oidc[0].client_id,
+      oidc[0].identity_provider_config_name,
+      oidc[0].issuer_url
     ]
  }
 }
