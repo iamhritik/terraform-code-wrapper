@@ -28,7 +28,7 @@ module "dev_eks_cluster" {
   endpoint_public           = false
   vpc_id                    = data.terraform_remote_state.vpc.outputs.vpc_id
   node_groups = {
-    "dev_node_group" = {
+    "worker_01" = {
       subnets            = flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id)
       ssh_key            = "opstree"
       security_group_ids = ["sg-001d4d01d818ed07f"]
@@ -85,4 +85,9 @@ resource "aws_ec2_tag" "add_tags_into_sg" {
     module.dev_eks_cluster,
     data.aws_security_group.controlplane_sg
   ]
+}
+
+
+output "nodegroup_data" {
+  value = module.dev_eks_cluster.outputs.module_node_group_resources
 }

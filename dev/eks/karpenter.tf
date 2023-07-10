@@ -79,12 +79,15 @@ resource "kubectl_manifest" "karpenter_provisioner" {
       name: default
     spec:
       requirements:
+        - key: "karpenter.k8s.aws/instance-category"
+          operator: In
+          values: ["t"]
         - key: karpenter.sh/capacity-type
           operator: In
           values: ["spot"]
       limits:
         resources:
-          cpu: 2
+          cpu: 3
       providerRef:
         name: default
       ttlSecondsAfterEmpty: 30
