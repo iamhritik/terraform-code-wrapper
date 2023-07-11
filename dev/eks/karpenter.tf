@@ -119,8 +119,10 @@ resource "kubectl_manifest" "karpenter_node_template" {
   ]
 }
 
-
+################################################################################
 #karpenter tags
+################################################################################
+
 resource "aws_ec2_tag" "karpenter_tags_into_subnet" {
   for_each = toset(flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id))
   resource_id = each.key

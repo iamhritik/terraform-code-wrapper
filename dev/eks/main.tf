@@ -49,7 +49,7 @@ module "dev_eks_cluster" {
 #To fetch controlplane security group id
 data "aws_security_group" "controlplane_sg" {
   tags = {
-    "aws:eks:cluster-name" = "dev-cluster"
+    "aws:eks:cluster-name" = var.cluster_name
   }
   depends_on = [
     module.dev_eks_cluster
