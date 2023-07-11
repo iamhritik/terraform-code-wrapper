@@ -118,3 +118,33 @@ resource "kubectl_manifest" "karpenter_node_template" {
     aws_security_group_rule.jenkins_add
   ]
 }
+
+
+#karpenter tags
+resource "aws_ec2_tag" "karpenter_tags_into_subnet" {
+  for_each = toset(flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id))
+  resource_id = each.key
+  key         = "karpenter.sh/discovery"
+  value       = var.cluster_name
+}
+
+
+resource "aws_ec2_tag" "karpenter_tags_01" {
+  resource_id =data.aws_security_group.controlplane_sg.id
+  key         = "karpenter.sh/discovery"
+  value       = var.cluster_name
+  depends_on = [
+    module.dev_eks_cluster,
+    data.aws_security_group.controlplane_sg
+  ]
+}
+
+resource "aws_ec2_tag" "karpenter_tags_02" {
+  resource_id = module.dev_eks_cluster.module_node_group_resources["dev-cluster:dev_node_gro"][0].remote_access_security_group_id
+  key         = "karpenter.sh/discovery"
+  value       = var.cluster_name
+  depends_on = [
+    module.dev_eks_cluster,
+    data.aws_security_group.controlplane_sg
+  ]
+}
