@@ -63,6 +63,26 @@ resource "helm_release" "karpenter" {
     name  = "settings.aws.interruptionQueueName"
     value = module.karpenter.queue_name
   }
+  
+  set{
+    name = "controller.resources.requests.cpu"
+    value = "0.1"
+  }
+  
+  set{
+    name = "controller.resources.requests.memory"
+    value = "100"
+  }
+  
+  set{
+    name = "controller.resources.limits.cpu"
+    value = "0.5"
+  }
+  
+  set{
+    name = "controller.resources.limits.memory"
+    value = "200"
+  }
   depends_on = [
     module.dev_eks_cluster,
     module.karpenter,
