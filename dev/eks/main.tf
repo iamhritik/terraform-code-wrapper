@@ -1,6 +1,6 @@
 locals {
   common_tags        = { ENV : "DEV", OWNER : "DEVOPS", PROJECT : "DEV_EKS_CLUSTER", COMPONENT : "EKS" }
-  worker_group1_tags = { "name" : "nodegroup-01", "karpenter.sh/discovery" : var.cluster_name }
+  worker_group1_tags = { "name" : "nodegroup-01" }
 }
 
 data "terraform_remote_state" "vpc" {
@@ -28,7 +28,7 @@ module "dev_eks_cluster" {
   endpoint_public           = false
   vpc_id                    = data.terraform_remote_state.vpc.outputs.vpc_id
   node_groups = {
-    "dev_node_group" = {
+    "nodegroup-01" = {
       subnets            = flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id)
       ssh_key            = "opstree"
       security_group_ids = ["sg-001d4d01d818ed07f"]
@@ -42,30 +42,4 @@ module "dev_eks_cluster" {
       labels             = { "node_group" : "nodegroup_01" }
     }
   }
-}
-
-#add one output to print eks cluster security group id as well
-
-#To fetch controlplane security group id
-data "aws_security_group" "controlplane_sg" {
-  tags = {
-    "aws:eks:cluster-name" = var.cluster_name
-  }
-  depends_on = [
-    module.dev_eks_cluster
-  ]
-}
-
-#Jenkins SG to communicate with eks cluster
-resource "aws_security_group_rule" "jenkins_add" {
-  security_group_id        = data.aws_security_group.controlplane_sg.id
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  source_security_group_id = "sg-001d4d01d818ed07f" #specify SG ID that you used to connect with kubernetes API server
-  depends_on = [
-    module.dev_eks_cluster,
-    data.aws_security_group.controlplane_sg
-  ]
 }

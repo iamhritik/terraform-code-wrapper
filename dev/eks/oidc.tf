@@ -19,11 +19,11 @@ resource "aws_iam_openid_connect_provider" "oidcp" {
   depends_on = [
     module.dev_eks_cluster
   ]
- lifecycle {
+  lifecycle {
     ignore_changes = [
       url
     ]
- }
+  }
 }
 
 data "aws_iam_policy_document" "oidc_assume_role_policy" {
@@ -55,11 +55,11 @@ resource "aws_eks_identity_provider_config" "demo" {
   depends_on = [
     module.dev_eks_cluster
   ]
- lifecycle {
+  lifecycle {
     ignore_changes = [
       oidc[0].client_id,
       oidc[0].identity_provider_config_name,
       oidc[0].issuer_url
     ]
- }
+  }
 }

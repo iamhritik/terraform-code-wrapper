@@ -1,6 +1,6 @@
 data "aws_availability_zones" "available" {}
 data "aws_ecrpublic_authorization_token" "token" {
-    provider = aws.virginia
+  provider = aws.virginia
 }
 data "aws_vpc" "details" {
   id = data.terraform_remote_state.vpc.outputs.vpc_id
@@ -9,8 +9,8 @@ locals {
   name            = "ex-${replace(basename(path.cwd), "_", "-")}"
   cluster_version = var.cluster_version
   region          = var.region
-  vpc_cidr = data.aws_vpc.details.cidr_block
-  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
+  vpc_cidr        = data.aws_vpc.details.cidr_block
+  azs             = slice(data.aws_availability_zones.available.names, 0, 3)
   tags = {
     resource = "karpenter"
   }
@@ -20,7 +20,7 @@ locals {
 # Karpenter
 ################################################################################
 module "karpenter" {
-  source = "../../modules/karpenter"
+  source                 = "../../modules/karpenter"
   cluster_name           = var.cluster_name
   irsa_oidc_provider_arn = aws_iam_openid_connect_provider.oidcp.arn
   policies = {
@@ -63,11 +63,11 @@ resource "helm_release" "karpenter" {
     name  = "settings.aws.interruptionQueueName"
     value = module.karpenter.queue_name
   }
-  depends_on = [ 
+  depends_on = [
     module.dev_eks_cluster,
     module.karpenter,
     aws_security_group_rule.jenkins_add
-   ]
+  ]
 
 }
 
@@ -124,7 +124,7 @@ resource "kubectl_manifest" "karpenter_node_template" {
 ################################################################################
 
 resource "aws_ec2_tag" "karpenter_tags_into_subnet" {
-  for_each = toset(flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id))
+  for_each    = toset(flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id))
   resource_id = each.key
   key         = "karpenter.sh/discovery"
   value       = var.cluster_name
@@ -132,7 +132,7 @@ resource "aws_ec2_tag" "karpenter_tags_into_subnet" {
 
 
 resource "aws_ec2_tag" "karpenter_tags_01" {
-  resource_id =data.aws_security_group.controlplane_sg.id
+  resource_id = data.aws_security_group.controlplane_sg.id
   key         = "karpenter.sh/discovery"
   value       = var.cluster_name
   depends_on = [
