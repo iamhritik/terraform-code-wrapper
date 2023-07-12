@@ -142,7 +142,7 @@ resource "aws_ec2_tag" "karpenter_tags_01" {
 }
 
 resource "aws_ec2_tag" "karpenter_tags_02" {
-  resource_id = module.dev_eks_cluster.module_node_group_resources["${var.cluster_name}:${nodegroup_name}"][0].remote_access_security_group_id
+  resource_id = module.dev_eks_cluster.module_node_group_resources["dev-cluster:nodegroup_01"][0].remote_access_security_group_id
   key         = "karpenter.sh/discovery"
   value       = var.cluster_name
   depends_on = [
