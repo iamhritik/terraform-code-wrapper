@@ -1,6 +1,6 @@
 locals {
   common_tags        = { ENV : "DEV", OWNER : "DEVOPS", PROJECT : "DEV_EKS_CLUSTER", COMPONENT : "EKS" }
-  worker_group1_tags = { "name" : "nodegroup-01" }
+  worker_group1_tags = { "name" : var.nodegroup_name }
 }
 
 data "terraform_remote_state" "vpc" {
@@ -28,7 +28,7 @@ module "dev_eks_cluster" {
   endpoint_public           = false
   vpc_id                    = data.terraform_remote_state.vpc.outputs.vpc_id
   node_groups = {
-    "nodegroup-01" = {
+    "nodegroup_01" = {
       subnets            = flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id)
       ssh_key            = "opstree"
       security_group_ids = ["sg-001d4d01d818ed07f"]
@@ -39,7 +39,7 @@ module "dev_eks_cluster" {
       disk_size          = 10
       capacity_type      = "ON_DEMAND"
       tags               = merge(local.common_tags, local.worker_group1_tags)
-      labels             = { "node_group" : "nodegroup_01" }
+      labels             = { "node_group" : var.nodegroup_name }
     }
   }
 }
