@@ -19,7 +19,7 @@ module "vpc_creation" {
   enable_public_web_security_group_resource            = false
   enable_pub_alb_resource                              = false
   enable_aws_route53_zone_resource                     = false
-  # tags                                                 = var.tags
+  tags                                                 = { "environment" : "dev", "provisioned_by" : "terraform" }
   #not required but still need it
   pvt_zone_name       = null
   logs_bucket         = null
@@ -27,16 +27,4 @@ module "vpc_creation" {
   public_web_sg_name  = null
   alb_name            = null
   alb_certificate_arn = null
-}
-
-output "vpc_id" {
-  value = module.vpc_creation.vpc_id
-}
-
-output "private_subnets_id" {
-  value = module.vpc_creation.pvt_subnet_ids
-}
-
-output "public_subnets_id" {
-  value = module.vpc_creation.public_subnet_ids
 }
