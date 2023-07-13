@@ -25,15 +25,7 @@ metadata:
   name: aws-auth
   namespace: kube-system
 data:
-  mapAccounts: |
-    []
   mapRoles: |
-${indent(4, yamlencode(local.aws_auth_roles))}
-  mapUsers: |
-    []
+    ${indent(4, yamlencode(local.aws_auth_roles))}
 YAML
-
-  depends_on = [
-    module.karpenter
-  ]
 }
