@@ -2,7 +2,7 @@ locals {
   aws_auth_roles = concat(
     [
       {
-        rolearn  = aws_iam_role.this.arn
+        rolearn  = module.karpenter.role_name
         username = "system:node:{{EC2PrivateDNSName}}"
         groups   = ["system:bootstrappers", "system:nodes"]
       },
