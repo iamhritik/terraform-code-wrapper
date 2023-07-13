@@ -1,6 +1,6 @@
 locals {
   common_tags        = { ENV : "DEV", OWNER : "DEVOPS", PROJECT : "DEV_EKS_CLUSTER", COMPONENT : "EKS" }
-  worker_group1_tags = { "name" : var.nodegroup_name }
+  worker_group1_tags = { "karpenter.sh/discovery" : var.cluster_name }
 }
 
 data "terraform_remote_state" "vpc" {
