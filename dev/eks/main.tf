@@ -33,9 +33,9 @@ module "dev_eks_cluster" {
       ssh_key            = "opstree"
       security_group_ids = ["sg-001d4d01d818ed07f"]
       instance_type      = ["t3a.small"]
-      desired_capacity   = 1
+      desired_capacity   = 2
       max_capacity       = 2
-      min_capacity       = 1
+      min_capacity       = 2
       disk_size          = 10
       capacity_type      = "ON_DEMAND"
       tags               = merge(local.common_tags, local.worker_group1_tags)
