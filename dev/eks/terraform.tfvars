@@ -19,6 +19,6 @@ nodegroup_labels = {
     workload_type = "default_nodegroup"
 }
 karpenter_version = "v0.29.0"
-karpenter_instance_category = ["t"]
-karpenter_capacity_type = ["spot"]
+karpenter_instance_category = "t"
+karpenter_capacity_type = "spot"
 provisioner_cpu_limit = "3"
