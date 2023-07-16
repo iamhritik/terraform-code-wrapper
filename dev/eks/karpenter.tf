@@ -1,24 +1,3 @@
-data "aws_availability_zones" "available" {}
-data "aws_ecrpublic_authorization_token" "token" {
-  provider = aws.virginia
-}
-data "aws_vpc" "details" {
-  id = data.terraform_remote_state.vpc.outputs.vpc_id
-}
-locals {
-  name            = "ex-${replace(basename(path.cwd), "_", "-")}"
-  cluster_version = var.cluster_version
-  region          = var.region
-  vpc_cidr        = data.aws_vpc.details.cidr_block
-  azs             = slice(data.aws_availability_zones.available.names, 0, 3)
-  tags = {
-    resource = "karpenter"
-  }
-}
-
-################################################################################
-# Karpenter
-################################################################################
 module "karpenter" {
   source                 = "../../modules/karpenter"
   cluster_name           = var.cluster_name
@@ -38,7 +17,7 @@ resource "helm_release" "karpenter" {
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
   chart               = "karpenter"
-  version             = "v0.21.1"
+  version             = var.karpenter_version
 
   set {
     name  = "settings.aws.clusterName"
@@ -63,22 +42,22 @@ resource "helm_release" "karpenter" {
     name  = "settings.aws.interruptionQueueName"
     value = module.karpenter.queue_name
   }
-  
+
   # set{
   #   name = "controller.resources.requests.cpu"
   #   value = "0.1"
   # }
-  
+
   # set{
   #   name = "controller.resources.requests.memory"
   #   value = "100"
   # }
-  
+
   # set{
   #   name = "controller.resources.limits.cpu"
   #   value = "0.5"
   # }
-  
+
   # set{
   #   name = "controller.resources.limits.memory"
   #   value = "200"
@@ -86,7 +65,7 @@ resource "helm_release" "karpenter" {
   depends_on = [
     module.dev_eks_cluster,
     module.karpenter,
-    aws_security_group_rule.jenkins_add
+    aws_security_group_rule.cluster_access
   ]
 
 }
@@ -101,13 +80,13 @@ resource "kubectl_manifest" "karpenter_provisioner" {
       requirements:
         - key: "karpenter.k8s.aws/instance-category"
           operator: In
-          values: ["t"]
+          values: ${var.karpenter_instance_category}
         - key: karpenter.sh/capacity-type
           operator: In
-          values: ["spot"]
+          values: ${var.karpenter_capacity_type}
       limits:
         resources:
-          cpu: 3
+          cpu: ${var.provisioner_cpu_limit}
       providerRef:
         name: default
       ttlSecondsAfterEmpty: 30
@@ -115,7 +94,7 @@ resource "kubectl_manifest" "karpenter_provisioner" {
 
   depends_on = [
     helm_release.karpenter,
-    aws_security_group_rule.jenkins_add
+    aws_security_group_rule.cluster_access
   ]
 }
 
@@ -135,23 +114,21 @@ resource "kubectl_manifest" "karpenter_node_template" {
   YAML
   depends_on = [
     helm_release.karpenter,
-    aws_security_group_rule.jenkins_add
+    aws_security_group_rule.cluster_access
   ]
 }
 
 ################################################################################
-#karpenter tags
+#karpenter tagging
 ################################################################################
-
-resource "aws_ec2_tag" "karpenter_tags_into_subnet" {
-  for_each    = toset(flatten(data.terraform_remote_state.vpc.outputs.private_subnets_id))
+resource "aws_ec2_tag" "karpenter_subnet_tags" {
+  for_each    = var.subnet_ids
   resource_id = each.key
   key         = "karpenter.sh/discovery"
   value       = var.cluster_name
 }
 
-
-resource "aws_ec2_tag" "karpenter_tags_01" {
+resource "aws_ec2_tag" "karpenter_sg_tags_01" {
   resource_id = data.aws_security_group.controlplane_sg.id
   key         = "karpenter.sh/discovery"
   value       = var.cluster_name
@@ -161,7 +138,7 @@ resource "aws_ec2_tag" "karpenter_tags_01" {
   ]
 }
 
-resource "aws_ec2_tag" "karpenter_tags_02" {
+resource "aws_ec2_tag" "karpenter_sg_tags_02" {
   resource_id = module.dev_eks_cluster.module_node_group_resources["dev-cluster:nodegroup_01"][0].remote_access_security_group_id
   key         = "karpenter.sh/discovery"
   value       = var.cluster_name

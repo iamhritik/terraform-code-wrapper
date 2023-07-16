@@ -1,5 +1,10 @@
 terraform {
   required_version = "~> 1.5.0"
+  backend "s3" {
+    bucket = "devterraform-tfstate"
+    key    = "dev/eks/terraform.tfstate"
+    region = "ap-south-1"
+  }
   required_providers {
     aws = {
       version = "~> 5.0"
@@ -20,11 +25,6 @@ terraform {
       source  = "hashicorp/null"
       version = ">= 3.0"
     }
-  }
-  backend "s3" {
-    bucket = "devterraform-tfstate"
-    key    = "dev/eks/terraform.tfstate"
-    region = "ap-south-1"
   }
 }
 #karpenter providers
