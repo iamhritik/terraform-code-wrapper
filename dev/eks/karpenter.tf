@@ -43,25 +43,25 @@ resource "helm_release" "karpenter" {
     value = module.karpenter.queue_name
   }
 
-  # set{
-  #   name = "controller.resources.requests.cpu"
-  #   value = "0.1"
-  # }
+  set{
+    name = "controller.resources.requests.cpu"
+    value = "0.1"
+  }
 
-  # set{
-  #   name = "controller.resources.requests.memory"
-  #   value = "100"
-  # }
+  set{
+    name = "controller.resources.requests.memory"
+    value = "100Mi"
+  }
 
-  # set{
-  #   name = "controller.resources.limits.cpu"
-  #   value = "0.5"
-  # }
+  set{
+    name = "controller.resources.limits.cpu"
+    value = "0.5"
+  }
 
-  # set{
-  #   name = "controller.resources.limits.memory"
-  #   value = "200"
-  # }
+  set{
+    name = "controller.resources.limits.memory"
+    value = "200Mi"
+  }
   depends_on = [
     module.dev_eks_cluster,
     module.karpenter,
@@ -80,10 +80,10 @@ resource "kubectl_manifest" "karpenter_provisioner" {
       requirements:
         - key: "karpenter.k8s.aws/instance-category"
           operator: In
-          values: ${var.karpenter_instance_category}
+          values: [${var.karpenter_instance_category}]
         - key: karpenter.sh/capacity-type
           operator: In
-          values: ${var.karpenter_capacity_type}
+          values: [${var.karpenter_capacity_type}]
       limits:
         resources:
           cpu: ${var.provisioner_cpu_limit}
@@ -122,7 +122,7 @@ resource "kubectl_manifest" "karpenter_node_template" {
 #karpenter tagging
 ################################################################################
 resource "aws_ec2_tag" "karpenter_subnet_tags" {
-  for_each    = var.subnet_ids
+  for_each    = toset(var.subnet_ids)
   resource_id = each.key
   key         = "karpenter.sh/discovery"
   value       = var.cluster_name

@@ -108,14 +108,14 @@ variable "karpenter_version" {
 }
 variable "karpenter_instance_category" {
   description = "karpenter instance category"
-  default     = ["t"]
-  type        = list(string)
+  default     = "t"
+  type        = string
 }
 
 variable "karpenter_capacity_type" {
   description = "karpenter capacity type"
-  default     = ["spot"]
-  type        = list(string)
+  default     = "spot"
+  type        = string
 }
 
 variable "provisioner_cpu_limit" {
