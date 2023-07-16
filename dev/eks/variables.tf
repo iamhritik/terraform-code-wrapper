@@ -31,6 +31,11 @@ variable "cluster_log_types" {
   type        = list(string)
 }
 
+variable "cluster_access_sg" {
+  description = "SG ID to access Private EKS cluster"
+  type        = string
+}
+
 variable "kubeconfig_path" {
   description = "EKS Cluster kubeconfig file path"
   type        = string
@@ -39,14 +44,14 @@ variable "kubeconfig_path" {
 
 variable "endpoint_private" {
   description = "EKS Cluster private endpoint"
-  type = bool
-  default = true
+  type        = bool
+  default     = true
 }
 
 variable "endpoint_public" {
   description = "EKS Cluster public endpoint"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 variable "nodegroup_role_name" {
@@ -57,26 +62,38 @@ variable "nodegroup_role_name" {
 
 variable "nodegroup_instane_type" {
   type        = list(any)
-  default     = ["t3a.small"]
+  default     = null
   description = "EKS nodegroup instance_types"
 }
 
 variable "nodegroup_desired_size" {
   type        = number
-  default     = 2
+  default     = 1
   description = "EKS nodegroup desired size"
 }
 
 variable "nodegroup_max_size" {
   type        = number
-  default     = 3
+  default     = 2
   description = "EKS nodegroup max size"
 }
 
 variable "nodegroup_min_size" {
   type        = number
-  default     = 2
+  default     = 1
   description = "EKS nodegroup min size"
+}
+
+variable "capacity_type" {
+  description = "EKS Nodes capacity type"
+  default     = "ON_DEMAND"
+  type        = string
+}
+
+variable "disk_size" {
+  description = "EKS Nodes Disk size"
+  default     = 10
+  type        = number
 }
 
 variable "nodegroup_labels" {

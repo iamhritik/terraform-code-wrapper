@@ -42,22 +42,22 @@ resource "helm_release" "karpenter" {
     name  = "settings.aws.interruptionQueueName"
     value = module.karpenter.queue_name
   }
-  
+
   # set{
   #   name = "controller.resources.requests.cpu"
   #   value = "0.1"
   # }
-  
+
   # set{
   #   name = "controller.resources.requests.memory"
   #   value = "100"
   # }
-  
+
   # set{
   #   name = "controller.resources.limits.cpu"
   #   value = "0.5"
   # }
-  
+
   # set{
   #   name = "controller.resources.limits.memory"
   #   value = "200"
@@ -65,7 +65,7 @@ resource "helm_release" "karpenter" {
   depends_on = [
     module.dev_eks_cluster,
     module.karpenter,
-    aws_security_group_rule.jenkins_add
+    aws_security_group_rule.cluster_access
   ]
 
 }
@@ -94,7 +94,7 @@ resource "kubectl_manifest" "karpenter_provisioner" {
 
   depends_on = [
     helm_release.karpenter,
-    aws_security_group_rule.jenkins_add
+    aws_security_group_rule.cluster_access
   ]
 }
 
@@ -114,7 +114,7 @@ resource "kubectl_manifest" "karpenter_node_template" {
   YAML
   depends_on = [
     helm_release.karpenter,
-    aws_security_group_rule.jenkins_add
+    aws_security_group_rule.cluster_access
   ]
 }
 

@@ -30,7 +30,7 @@ module "dev_eks_cluster" {
     }
   }
 
-  depends_on = [ 
+  depends_on = [
     data.terraform_remote_state.vpc
   ]
 }
