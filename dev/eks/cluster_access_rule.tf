@@ -8,13 +8,13 @@ data "aws_security_group" "controlplane_sg" {
 }
 
 #Jenkins SG to communicate with eks cluster
-resource "aws_security_group_rule" "jenkins_add" {
+resource "aws_security_group_rule" "cluster_access" {
   security_group_id        = data.aws_security_group.controlplane_sg.id
   type                     = "ingress"
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
-  source_security_group_id = "sg-001d4d01d818ed07f" #specify SG ID that you used to connect with kubernetes API server
+  source_security_group_id = var.cluster_access_sg #specify SG ID that you used to connect with kubernetes API server
   depends_on = [
     module.dev_eks_cluster,
     data.aws_security_group.controlplane_sg
